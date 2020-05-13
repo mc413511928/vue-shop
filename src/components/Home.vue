@@ -12,9 +12,10 @@
     <el-container>
       <!-- 侧边栏 -->
       <el-aside width="200px">
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
          <el-menu  background-color="#333744"
             text-color="#fff"
-            active-text-color="#409BFF" unique-opened router :default-active="activePath">
+            active-text-color="#409BFF" unique-opened router :default-active="activePath" :collapse="isColapse" :collapse-transition="false">
       <!-- 一级菜单 -->
       <el-submenu :index="item.id+''" v-for="item in menuList" :key="item.id">
         <template slot="title">
@@ -48,7 +49,8 @@ export default {
         102: 'iconfont icon-danju',
         145: 'iconfont icon-baobiao'
       },
-      activePath: ''
+      activePath: '',
+      isColapse: false
     }
   },
   created () {
@@ -71,6 +73,9 @@ export default {
     },
     saveNavState (activePath) {
       window.sessionStorage.setItem('activePath', activePath)
+    },
+    toggleCollapse () {
+      this.isColapse = !this.isColapse
     }
   }
 }
@@ -110,5 +115,13 @@ export default {
 }
 .iconfont{
   margin-right: 10px;
+}
+.toggle-button{
+  line-height: 24px;
+  letter-spacing: 0.2em;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+
 }
 </style>
