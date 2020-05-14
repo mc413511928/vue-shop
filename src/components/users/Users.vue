@@ -85,23 +85,23 @@
       </span>
     </el-dialog>
     <!-- 修改对话框 -->
-    <el-dialog title="修改用户" :visible.sync="edilogVisible" width="50%">
+    <el-dialog title="修改用户" :visible.sync="edilogVisible" width="50%" @close="ediCloseForm">
       <el-form ref="ediformRef" :rules="ediformRules" :model="eidForm" label-width="80px">
         <el-form-item label="用户名">
           <el-input v-model="eidForm.username" disabled></el-input>
         </el-form-item>
 
-         <el-form-item label="邮箱">
+         <el-form-item label="邮箱" prop="email">
           <el-input v-model="eidForm.email"></el-input>
         </el-form-item>
-           <el-form-item label="电话">
+           <el-form-item label="电话" prop="mobile">
           <el-input v-model="eidForm.mobile"></el-input>
         </el-form-item>
 
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="edilogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="edilogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="editEnter">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -253,6 +253,7 @@ export default {
         }
       })
     },
+    // 修改用户
     async ediusers (id) {
       const { data: res } = await this.$http.get('users/' + id)
       if (res.meta.status !== 200) {
@@ -260,7 +261,28 @@ export default {
       } else {
         this.eidForm = res.data
         this.edilogVisible = true
+        console.log(this.eidForm)
       }
+    },
+    ediCloseForm () {
+      this.$refs.ediformRef.resetFields()
+    },
+    // 修改用户发送请求
+    editEnter () {
+      // 验证表单
+      this.$refs.ediformRef.validate(async valid => {
+        if (valid) {
+          await this.$http.put(
+            'users/' + this.eidForm.id,
+            {
+              email: this.eidForm.email,
+              mobile: this.eidForm.mobile
+            }
+          )
+          this.edilogVisible = false
+          this.getUserList()
+        }
+      })
     },
     async removeUser (id) {
       // this.$confirm('确认删除此用户吗？', '提示', {
@@ -280,6 +302,7 @@ export default {
         }
       }).catch(() => {})
     }
+
   }
 }
 </script>
