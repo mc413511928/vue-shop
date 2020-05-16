@@ -261,7 +261,6 @@ export default {
       } else {
         this.eidForm = res.data
         this.edilogVisible = true
-        console.log(this.eidForm)
       }
     },
     ediCloseForm () {

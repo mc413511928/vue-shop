@@ -69,13 +69,53 @@
         </el-table-column>
       </el-table>
     </el-card>
+       <el-dialog title="添加" :visible.sync="addRolesVisible" @closed="handleRoles" width="50%">
+      <el-form :model="addRolesForm" :rules="addRolesFormRules" ref="addRolesFormRefs" label-width="100px">
+        <el-form-item label="角色名称" prop="roleDesc">
+          <el-input v-model="addRolesForm.roleDesc"></el-input>
+        </el-form-item>
+          <el-form-item label="角色描述" prop="roleName">
+          <el-input v-model="addRolesForm.roleName"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addRolesVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addForm">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data () {
     return {
-      rolesList: []
+      rolesList: [],
+      addRolesVisible: false,
+      addRolesForm: {
+        roleDesc: '',
+        roleName: ''
+      },
+      addRolesFormRules: {},
+      addRolesFormRefs: {
+        roleDesc: [
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          {
+            min: 3,
+            max: 10,
+            message: '用户名在3~10个字符之间',
+            trigger: 'blur'
+          }
+        ],
+        roleName: [
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          {
+            min: 3,
+            max: 10,
+            message: '用户名在3~10个字符之间',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   created () {
@@ -87,8 +127,24 @@ export default {
       this.rolesList = res.data
       console.log(res)
     },
-    addRoles () {}
+    addRoles () {
+      this.addRolesVisible = true
+    },
+    handleRoles () {
+      this.$refs.addRolesFormRefs.resetFields()
+    },
+    addForm () {
+      this.$refs.addRolesFormRefs.validate(async valid => {
+        if (valid) {
+          await this.$http.post('roles', this.addRolesForm)
+          this.getRolesList()
+          this.$message.success('添加用户成功')
+          this.addRolesVisible = false
+        }
+      })
+    }
   }
+
 }
 </script>
 <style lang="less" scope>
