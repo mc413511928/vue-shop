@@ -68,7 +68,6 @@ export default {
         this.$message.error(res.meta.msg)
       } else {
         this.menuList = res.data
-        console.log(res)
       }
     },
     saveNavState (activePath) {
