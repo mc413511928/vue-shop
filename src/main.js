@@ -6,7 +6,10 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '../src/assets/css/global.css'
 import './assets/fonts/iconfont.css'
+// import TreeTable from 'tree-table-vue'
 import axios from 'axios'
+import TreeTable from 'tree-table-vue'
+
 // 配置根路径
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 // 拦截器
@@ -17,6 +20,9 @@ axios.interceptors.request.use(config => {
 })
 Vue.prototype.$http = axios
 Vue.use(ElementUI)
+
+Vue.component('tree-table', TreeTable)
+// Vue.use(TreeTable)
 Vue.config.productionTip = false
 
 new Vue({
