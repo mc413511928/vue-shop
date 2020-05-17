@@ -40,7 +40,12 @@
               size="mini"
               @click="ediusers(scope.row.id)"
             ></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUser(scope.row.id)"></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removeUser(scope.row.id)"
+            ></el-button>
             <el-tooltip
               class="item"
               effect="dark"
@@ -48,7 +53,7 @@
               placement="top"
               :enterable="false"
             >
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="seatRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -91,17 +96,35 @@
           <el-input v-model="eidForm.username" disabled></el-input>
         </el-form-item>
 
-         <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱" prop="email">
           <el-input v-model="eidForm.email"></el-input>
         </el-form-item>
-           <el-form-item label="电话" prop="mobile">
+        <el-form-item label="电话" prop="mobile">
           <el-input v-model="eidForm.mobile"></el-input>
         </el-form-item>
-
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="edilogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editEnter">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 分配角色 -->
+    <el-dialog title="修改用户" :visible.sync="setRoleslogVisible" width="50%">
+
+    <p>当前用户:{{userInfo.username}}</p>
+    <p>当前角色:{{userInfo.role_name}}</p>
+    <p>分配角色
+      <el-select v-model="selectedId" placeholder="请选择">
+    <el-option
+      v-for="item in roleList"
+      :key="item.id"
+      :label="item.roleName"
+      :value="item.id">
+    </el-option>
+  </el-select>
+    </p>
+        <el-button @click="setRoleslogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRole">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -142,6 +165,11 @@ export default {
         email: '',
         mobile: ''
       },
+      userInfo: {},
+
+      selectedId: '',
+      roleList: [],
+      setRoleslogVisible: false,
 
       addFormRefs: {
         username: [
@@ -180,9 +208,7 @@ export default {
         ]
       },
       edilogVisible: false,
-      eidForm: {
-
-      },
+      eidForm: {},
 
       ediformRules: {
         email: [
@@ -271,13 +297,10 @@ export default {
       // 验证表单
       this.$refs.ediformRef.validate(async valid => {
         if (valid) {
-          await this.$http.put(
-            'users/' + this.eidForm.id,
-            {
-              email: this.eidForm.email,
-              mobile: this.eidForm.mobile
-            }
-          )
+          await this.$http.put('users/' + this.eidForm.id, {
+            email: this.eidForm.email,
+            mobile: this.eidForm.mobile
+          })
           this.edilogVisible = false
           this.getUserList()
         }
@@ -293,15 +316,29 @@ export default {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(async () => {
-        if (confirm) {
-          await this.$http.delete('users/' + id)
-          this.$message.success('删除用户成功')
-          this.getUserList()
-        }
-      }).catch(() => {})
-    }
+      })
+        .then(async () => {
+          if (confirm) {
+            await this.$http.delete('users/' + id)
+            this.$message.success('删除用户成功')
+            this.getUserList()
+          }
+        })
+        .catch(() => {})
+    },
+    async seatRole (userInfo) {
+      this.setRoleslogVisible = true
+      this.userInfo = userInfo
+      const { data: res } = await this.$http.get('roles')
+      this.roleList = res.data
+    },
+    async saveRole () {
+      const { data: res } = await this.$http.put('users/' + this.userInfo.id + '/role', { rid: this.selectedId })
+      console.log(res)
 
+      this.getUserList()
+      this.setRoleslogVisible = false
+    }
   }
 }
 </script>

@@ -40,7 +40,7 @@
                   :key="item2.id"
                 >
                   <el-col :span="6">
-                    <el-tag type="success">
+                    <el-tag type="success" closable @close="removeRoles(scope.row,item2.id)">
                       {{item2.authName}}
                       <i class="el-icon-caret-right"></i>
                     </el-tag>
