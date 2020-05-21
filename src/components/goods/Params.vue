@@ -131,6 +131,7 @@
   </div>
 </template>
 <script>
+import _ from 'underscore'
 export default {
   data () {
     return {
@@ -301,7 +302,10 @@ export default {
     async saveAttrVals (row) {
       const { data: res } = await this.$http.put('categories/' + this.cataId + '/attributes/' + row.attr_id, { attr_name: row.attr_name, attr_sel: row.attr_sel, attr_vals: row.attr_vals.join(' ') })
     },
-    handleInputConfirm (row) {
+    // handleInputConfirm (row) {
+
+    // },
+    handleInputConfirm: _.debounce(function (row) {
       if (row.inputValue.trim().length === 0) {
         row.inputValue = ''
         row.inputVisible = false
@@ -310,7 +314,7 @@ export default {
       row.attr_vals.push(row.inputValue.trim())
       row.inputVisible = false
       this.saveAttrVals(row)
-    },
+    }, 500, true),
     showInput (row) {
       row.inputVisible = true
       this.$nextTick(_ => {
