@@ -83,7 +83,7 @@
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
             <quill-editor v-model="addForm. goods_introduce"></quill-editor>
-            <el-button>添加</el-button>
+            <el-button @click="addText">添加</el-button>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -100,6 +100,7 @@
   </div>
 </template>
 <script>
+import _ from 'lodash'
 export default {
   data () {
     return {
@@ -110,7 +111,7 @@ export default {
       addFormrules: {
         goods_price: [
           {
-            type: 'number',
+
             required: true,
             message: '请输入商品价格',
             trigger: 'blur'
@@ -175,7 +176,8 @@ export default {
         goods_cat: [1, 2, 5],
 
         goods_introduce: '',
-        pics: []
+        pics: [],
+        attrs: []
       },
 
       catProps: {
@@ -263,6 +265,38 @@ export default {
     },
     handleClose () {
       this.previewdialogVisible = false
+    },
+    addText () {
+      this.$refs.addFormRef.validate(async valid => {
+        if (valid) {
+          // this.addForm.goods_cat
+          const form = _.cloneDeep(this.addForm)
+          form.goods_cat = form.goods_cat.join(',')
+          this.manyList.forEach(item => {
+            form.attrs.push({ attr_id: item.attr_id, attr_value: item.attr_vals.join(' ') })
+          })
+          this.onlyList.forEach(item => {
+            form.attrs.push({ attr_id: item.attr_id, attr_value: item.attr_vals })
+          })
+          const { data: res } = await this.$http.post('goods', form)
+          if (res.mate.status !== 200) {
+            this.$message({
+              message: '添加失败了',
+              type: 'error'
+            })
+          }
+          this.$message({
+            message: '添加成功了',
+            type: 'success'
+          })
+          this.$router.push('/goods')
+        } else {
+          this.$message({
+            message: '添加失败了',
+            type: 'info'
+          })
+        }
+      })
     }
   }
 }
